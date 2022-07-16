@@ -31,12 +31,27 @@ class _UserPageState extends State<UserPage> {
 }
 
 Future createUser({required String name}) async {
-  final docUser = FirebaseFirestore.instance.collection('user').doc('my-id');
+  final docUser = FirebaseFirestore.instance.collection('user').doc();
 
-  final json = {
-    'name': name,
-    'age': 21,
-    'birthday': DateTime(2001, 7, 28),
-  };
+  final user = User(
+      id: docUser.id, name: name, age: 21, birthday: DateTime(2001, 10, 12));
+  final json = user.toJson();
+
   await docUser.set(json);
+}
+
+class User {
+  String id;
+  final String name;
+  final int age;
+  final DateTime birthday;
+
+  User(
+      {this.id = '',
+      required this.name,
+      required this.age,
+      required this.birthday});
+
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'name': name, 'age': age, 'birthday': birthday};
 }
