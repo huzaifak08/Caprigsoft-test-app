@@ -9,32 +9,74 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  final controller = TextEditingController();
+  final controllerName = TextEditingController();
+  final controllerAge = TextEditingController();
+  final controllerDate = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TextField(controller: controller),
-        actions: [
-          IconButton(
-            onPressed: () {
-              final name = controller.text;
-
-              createUser(name: name);
-            },
-            icon: Icon(Icons.add),
-          ),
-        ],
+        title: Text("Add user to FireStore"),
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            SizedBox(height: 12),
+            TextField(
+              controller: controllerName,
+              decoration: InputDecoration(
+                label: Text("Name"),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(23),
+                ),
+              ),
+            ),
+            SizedBox(height: 12),
+            TextField(
+              controller: controllerAge,
+              decoration: InputDecoration(
+                label: Text("Age"),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(23),
+                ),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 12),
+            TextField(
+              controller: controllerDate,
+              decoration: InputDecoration(
+                label: Text("Date Of Birth"),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(23),
+                ),
+              ),
+              keyboardType: TextInputType.text,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final newUser = User(
+                    name: controllerName.text,
+                    age: int.parse(controllerAge.text),
+                    birthday: DateTime.parse(controllerDate.text));
+                Navigator.pop(context);
+                createUser(user: newUser);
+              },
+              child: Text("Add User"),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-Future createUser({required String name}) async {
-  final docUser = FirebaseFirestore.instance.collection('user').doc();
+Future createUser({required User user}) async {
+  final docUser = FirebaseFirestore.instance.collection('users').doc();
+  user.id = docUser.id;
 
-  final user = User(
-      id: docUser.id, name: name, age: 21, birthday: DateTime(2001, 10, 12));
+  // final user = User(
+  //     id: docUser.id, name: name, age: 21, birthday: DateTime(2001, 10, 12));
   final json = user.toJson();
 
   await docUser.set(json);
